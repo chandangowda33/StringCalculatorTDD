@@ -22,13 +22,15 @@ function add(numberString) {
 
   //step4:Support different delimiters
   if (numberString.startsWith("//")) {
-    const delimiterMatch = numberString.match(/^\/\/\[(.+?)\]\n/);
+    const delimiterMatch = numberString.match(/^\/\/(\[.+?\])+\n/);
     if (delimiterMatch) {
-      const escapedDelimiter = delimiterMatch[1].replace(
-        /[.*+?^${}()|[\]\\]/g,
-        "\\$&"
-      );
-      delimiter = new RegExp(escapedDelimiter);
+      const delimiters = [];
+      const delimiterPattern = /\[(.+?)\]/g;
+      let match;
+      while ((match = delimiterPattern.exec(delimiterMatch[0])) !== null) {
+        delimiters.push(match[1].replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      }
+      delimiter = new RegExp(delimiters.join("|"));
       numberString = numberString.slice(delimiterMatch[0].length);
     } else {
       delimiter = new RegExp(numberString[2]);
